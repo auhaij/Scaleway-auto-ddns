@@ -1,5 +1,10 @@
 #!/bin/bash
 
+
+# Telegram Bot 相关参数
+telegram_bot_token="YOUR_TELEGRAM_BOT_TOKEN"
+telegram_chat_id="YOUR_TELEGRAM_CHAT_ID"
+
 # Cloudflare 相关参数
 email=""
 api_key=""
@@ -37,11 +42,17 @@ recordIp=$(echo "$res" | jq -r ".result[0].content")
       resSuccess=$(echo "$res" | jq -r ".success")
     fi
 
-    if [[ $resSuccess = "true" ]]; then
-      echo "$hostname更新成功"
-    else
-      echo "$hostname更新失败"
-    fi
+# 发送 Telegram 消息
+message=""
+if [[ $resSuccess = "true" ]]; then
+  message="$hostname 更新成功"
+else
+  message="$hostname 更新失败"
+fi
+
+curl -s -X POST "https://api.telegram.org/bot$telegram_bot_token/sendMessage" \
+     -d "chat_id=$telegram_chat_id" \
+     -d "text=$message"
 
 
 
